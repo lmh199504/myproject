@@ -8,8 +8,11 @@ import {
 	InputItem,
 	Radio,
 	Button,
-	WhiteSpace
+	WhiteSpace,
+	Toast
 } from 'antd-mobile'
+import { reqRegister } from "../../api";
+
 import Logo from '../../components/logo/logo'
 
 const ListItem = List.Item
@@ -24,7 +27,21 @@ export default class Register extends Component {
 	}
 	
 	register = () => {
-		
+		const { username,password,password2,type } = this.state
+		if(password !== password2){
+			Toast.fail('密码不一致')
+			return
+		}
+		reqRegister({
+			username,
+			password,
+			type
+		}).then(res => {
+			if(res.code === 0){
+				Toast.success('注册成功.')
+				this.props.history.replace('/main')
+			}
+		})
 	}
 	handleChange = (name,val) => {
 		this.setState({
@@ -45,8 +62,8 @@ export default class Register extends Component {
 				<WingBlank>
 					<List>
 						<InputItem onChange={ val => {this.handleChange('username',val)} }>用户名:</InputItem>
-						<InputItem type="password" onChange={ val => {this.handleChange('username',val)} }>密&nbsp;&nbsp;&nbsp;码:</InputItem>
-						<InputItem type="password" onChange={ val => {this.handleChange('username',val)} }>确认密码:</InputItem>
+						<InputItem type="password" onChange={ val => {this.handleChange('password',val)} }>密&nbsp;&nbsp;&nbsp;码:</InputItem>
+						<InputItem type="password" onChange={ val => {this.handleChange('password2',val)} }>确认密码:</InputItem>
 						<ListItem>
 							<span>用户类型:</span>
 							&nbsp;&nbsp;&nbsp;
