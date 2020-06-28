@@ -15,13 +15,12 @@ const Service = axios.create({
 // 添加请求拦截器
 Service.interceptors.request.use(config => {
     let userid = Cookies.get('userid')
-    console.log(userid)
 	if(userid){
 		return config
 	}else{
 		console.log("未登录")
 	}
-    
+    return config
 })
 // 添加响应拦截器
 Service.interceptors.response.use(response => {

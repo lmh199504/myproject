@@ -8,16 +8,17 @@ import {
 	InputItem,
 	Radio,
 	Button,
-	WhiteSpace,
-	Toast
+	WhiteSpace
 } from 'antd-mobile'
-import { reqRegister } from "../../api";
 
+import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
+import { register } from '../../redux/actions'
 import Logo from '../../components/logo/logo'
 
 const ListItem = List.Item
 
-export default class Register extends Component {
+class Register extends Component {
 	
 	state = {
 		username:'', //用户名
@@ -27,21 +28,7 @@ export default class Register extends Component {
 	}
 	
 	register = () => {
-		const { username,password,password2,type } = this.state
-		if(password !== password2){
-			Toast.fail('密码不一致')
-			return
-		}
-		reqRegister({
-			username,
-			password,
-			type
-		}).then(res => {
-			if(res.code === 0){
-				Toast.success('注册成功.')
-				this.props.history.replace('/main')
-			}
-		})
+		this.props.register(this.state)
 	}
 	handleChange = (name,val) => {
 		this.setState({
@@ -54,6 +41,13 @@ export default class Register extends Component {
 	
 	render(){
 		const { type } = this.state
+		const { redirectTo } = this.props.user
+
+		if(redirectTo){
+			return <Redirect to={redirectTo}/>
+		}
+		
+		
 		return (
 			<div>
 				<NavBar>BOSS直聘</NavBar>
@@ -84,3 +78,7 @@ export default class Register extends Component {
 }
 
 
+export default connect(
+	state=>({user:state.user}),
+	{register}
+)(Register)

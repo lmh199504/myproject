@@ -7,12 +7,14 @@ import {
 	WingBlank,
 	Button,
 	List,
-	InputItem,
-	Toast
+	InputItem
 } from 'antd-mobile'
-import { reqLogin } from "../../api";
+import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
+import { login } from '../../redux/actions'
 
-export default class Login extends Component {
+
+class Login extends Component {
 
 	state = {
 		username:'',
@@ -20,21 +22,8 @@ export default class Login extends Component {
 	}
 
 	login = () => {
-		const { username,password } = this.state
-		if(username !== '' && password !== ''){
-			reqLogin({
-				username,
-				password
-			}).then(res => {
-				if(res.code === 0){
-					Toast.success('登录成功')
-					this.props.history.replace('/main')
-				}
-			})
-		}else{
-			Toast.info('请输入账号密码')
-		}
-
+		this.props.login(this.state)
+		// console.log()
 	}
 	handleChange = (name,val) => {
 		this.setState({
@@ -45,6 +34,12 @@ export default class Login extends Component {
 		this.props.history.replace('/register')
 	}
 	render(){
+		const { redirectTo } = this.props.user
+		
+		if(redirectTo){
+			return <Redirect to={redirectTo}/>
+		}
+		
 		return (
 			<div>
 				<NavBar>登陆</NavBar>
@@ -64,3 +59,7 @@ export default class Login extends Component {
 		)
 	}
 }
+export default connect(
+	state=>({user:state.user}),
+	{ login }
+)(Login)
