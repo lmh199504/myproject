@@ -4,14 +4,19 @@
 	同步action
  */
 
-import { reqLogin,reqRegister} from "../api";
-import { AUTH_SUCCESS,ERROR_MSG } from "./action-types";
+import { reqLogin,reqRegister,reqUpdataUser} from "../api";
+import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER } from "./action-types";
 import { Toast } from 'antd-mobile'
 
 //授权成功的同步action
 export const authSuccess = (data) => ({type:AUTH_SUCCESS,data})
 //错误提示信息的同步action
 export const errorMsg = (data) => ({type:ERROR_MSG,data})
+//接收用户的同步action
+export const receiveUser = (data) => ({type:RECEIVE_USER,data})
+//重置用户的同步action
+export const resetUser = (data) => ({type:RESET_USER,data})
+
 
 //注册异步action
 export const register = (data) => {
@@ -54,4 +59,19 @@ export const login = (data) => {
             return dispatch(errorMsg(response.msg))
         }
     }
+}
+
+//更新用户的异步action
+export const updata = (data) => {
+	return async dispatch => {
+		const response = await reqUpdataUser(data)
+		if(response.code === 0){
+			//更新成功 data
+			dispatch(receiveUser(response.data))
+		}else{
+			//更新失败 msg
+			dispatch(resetUser(response.msg))
+		}
+		
+	}
 }
