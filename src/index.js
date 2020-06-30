@@ -8,6 +8,7 @@ import { HashRouter,Route,Switch } from 'react-router-dom'
 import Register from './containers/register/register'
 import Login from './containers/login/login'
 import Main from './containers/main/main'
+import './assets/css/index.css'
 ReactDOM.render(
 	<Provider store={ store }>
 		<HashRouter>

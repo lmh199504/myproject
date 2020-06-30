@@ -4,7 +4,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { NavBar,InputItem,TextareaItem,Button } from 'antd-mobile'
+import { Redirect } from 'react-router-dom'
 import HeaderSelector from '../../components/header-selector/header-selector'
+import { updata } from '../../redux/actions'
 class DashenInfo extends React.Component{
 	
 	
@@ -27,11 +29,18 @@ class DashenInfo extends React.Component{
 	}
 	save = () => {
 		console.log(this.state)
+		this.props.updata(this.state)
 	}
 	
 	
 	
 	render() {
+		const { header,type } = this.props.user
+		if(header){  //信息已经完善
+			const path = type === 'dashen' ? '/dashen' : '/laoban'
+			return <Redirect to={path}></Redirect>
+		}
+		
 		return(
 			<div>
 				<NavBar>大神信息完善</NavBar>
@@ -50,6 +59,6 @@ class DashenInfo extends React.Component{
 }
 
 export default connect(
-	state => ({}),
-	{}
+	state => ({user:state.user}),
+	{updata}
 )(DashenInfo)

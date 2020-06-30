@@ -30,7 +30,6 @@ Service.interceptors.response.use(response => {
     }
     return response.data
 }, error => {
-
     const msg = error.Message !== undefined ? error.Message : '请求错误.'
     Toast.fail(msg)
     return Promise.reject(error)
@@ -38,7 +37,7 @@ Service.interceptors.response.use(response => {
 
 const request = (url,data={},type="POST") => {
     if(type === 'GET'){
-        return Service.get(url,{param:data})
+        return Service.get(url,{params:data})
     }else{
         return Service.post(url,data)
     }

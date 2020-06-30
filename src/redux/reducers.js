@@ -4,7 +4,7 @@
 
 import { combineReducers } from 'redux'
 import { getRedirectTo } from '../utils/index'
-import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER } from "./action-types";
+import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST } from "./action-types";
 const initUser = {
 	username:"", //用户名
 	type:"", //用户类型 dashen/laoban
@@ -22,7 +22,17 @@ function user (state = initUser,action){
 		case RECEIVE_USER:
 			return action.data
 		case RESET_USER:
-			return {...state,msg:action.data}
+			return {...initUser,msg:action.data}
+		default:
+			return state
+	}
+}
+
+const initUserList = []
+function userList (state = initUserList,action){
+	switch (action.type) {
+		case RECEIVE_USER_LIST:
+			return action.data
 		default:
 			return state
 	}
@@ -31,6 +41,7 @@ function user (state = initUser,action){
 
 export default combineReducers({
 	user,
+	userList
 })
 
 //向外暴露的状态的结构：{user:{}}

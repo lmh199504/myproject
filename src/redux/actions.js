@@ -4,8 +4,8 @@
 	同步action
  */
 
-import { reqLogin,reqRegister,reqUpdataUser} from "../api";
-import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER } from "./action-types";
+import { reqLogin,reqRegister,reqUpdataUser,reqUser,reqUserList} from "../api";
+import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST } from "./action-types";
 import { Toast } from 'antd-mobile'
 
 //授权成功的同步action
@@ -16,7 +16,8 @@ export const errorMsg = (data) => ({type:ERROR_MSG,data})
 export const receiveUser = (data) => ({type:RECEIVE_USER,data})
 //重置用户的同步action
 export const resetUser = (data) => ({type:RESET_USER,data})
-
+//接收用户列表数据的同步action
+export const receiveUserList = (data) => ({type:RECEIVE_USER_LIST,data})
 
 //注册异步action
 export const register = (data) => {
@@ -67,11 +68,38 @@ export const updata = (data) => {
 		const response = await reqUpdataUser(data)
 		if(response.code === 0){
 			//更新成功 data
+			Toast.success('保存成功.')
 			dispatch(receiveUser(response.data))
 		}else{
 			//更新失败 msg
 			dispatch(resetUser(response.msg))
 		}
 		
+	}
+}
+
+//获取用户数据的异步action
+export const getUser = () => {
+	return async dispatch => {
+		const response = await reqUser()
+		if(response.code === 0){
+			//成功
+			dispatch(receiveUser(response.data))
+		}else{
+			//失败
+			dispatch(resetUser(response.msg))
+		}
+		
+	}
+}
+
+//获取用户列表的异步action
+export const getUserList = (data) => {
+	return async dispatch => {
+		const response = await reqUserList(data)
+		
+		if(response.code === 0){
+			return dispatch(receiveUserList(response.data))
+		}
 	}
 }

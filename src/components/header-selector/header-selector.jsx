@@ -13,10 +13,9 @@ export default class HeaderSelector extends React.Component {
 		for(let i = 0;i<20;i ++){
 			this.headerImgs.push({
 				text:'头像' + (i+1),
-				icon:require(`./headers/${(i+1)}.jpg`)
+				icon:require(`../../assets/headers/${(i+1)}.jpg`)
 			})
-		}
-		
+		}	
 	}
 	
 	static propTypes = {
@@ -31,9 +30,7 @@ export default class HeaderSelector extends React.Component {
 		this.setState({
 			icon
 		})
-		
 		this.props.setHeader(text)
-		
 	}
 	
 	render() {
