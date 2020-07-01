@@ -7,6 +7,8 @@
 import { reqLogin,reqRegister,reqUpdataUser,reqUser,reqUserList} from "../api";
 import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST } from "./action-types";
 import { Toast } from 'antd-mobile'
+import io from 'socket.io-client'
+
 
 //授权成功的同步action
 export const authSuccess = (data) => ({type:AUTH_SUCCESS,data})
@@ -101,5 +103,24 @@ export const getUserList = (data) => {
 		if(response.code === 0){
 			return dispatch(receiveUserList(response.data))
 		}
+	}
+}
+
+//异步发送消息的action 
+export const sendMsg = ({ from,to,content }) => {
+	return dispatch => {
+		initIO()
+		io.socket.emit('sendMsg',{ from,to,content });  //自定义sendMsg事件，发送‘你好服务器’字符串向服务器
+	}
+}
+
+initIO()
+function initIO () {
+	if(!io.socket){
+		//向指定的服务器建立连接，地址可以省略
+		io.socket = io('http://localhost:4000');
+		io.socket.on('receiveMsg',(data)=>{  //接收服务器的消息 receiveMsg事件
+			console.log(data);//你好浏览器
+		});
 	}
 }

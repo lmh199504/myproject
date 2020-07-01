@@ -3,10 +3,11 @@
 import React,{Component} from 'react'
 import { WingBlank,WhiteSpace,Card } from 'antd-mobile'
 import PropTypes from 'prop-types'
+import { withRouter } from 'react-router-dom'
 
 
 
-export default class UserList extends Component{
+class UserList extends Component{
 	
 	static propTypes = {
 		userList:PropTypes.array.isRequired
@@ -22,7 +23,7 @@ export default class UserList extends Component{
 						userList.map(item => (
 							<div key={ item._id }>
 								<WhiteSpace />
-								<Card>
+								<Card onClick={ () => this.props.history.push(`/chat/${item._id}`) }>
 									<Card.Header
 										thumb={ item.header ? require(`../../assets/headers/${item.header.replace('头像','')}.jpg`) : require(`../../assets/headers/timg.jpg`) }
 										thumbStyle={ {width:50,borderRadius:25} }
@@ -46,3 +47,5 @@ export default class UserList extends Component{
 		)
 	}
 }
+
+export default withRouter(UserList)

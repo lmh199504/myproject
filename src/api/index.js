@@ -12,3 +12,9 @@ export const reqUser = (data) => request('/user',data,"GET")
 
 //获取用户列表
 export const reqUserList = (data) => request('/userlist',data,"GET")
+
+//获取消息列表
+export const reqChatMsgList = (data) => request('/msglist',data,'GET')
+
+//修改指定消息为已读
+export const reqReadMsg = (data) => request('/readmsg',data)

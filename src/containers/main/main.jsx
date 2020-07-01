@@ -12,6 +12,7 @@ import Message from '../message/message'
 import Personal from '../personal/personal'
 import NotFound from '../../components/not-found/not-found'
 import NavFooter from '../../components/nav-footer/nav-footer'
+import Chat from '../chat/chat'
 import { getRedirectTo } from '../../utils/index'
 
 import {getUser} from '../../redux/actions'
@@ -54,12 +55,12 @@ class Main extends Component {
 		const userid = Cookies.get('userid')
 		const { _id } = this.props.user
 		if(userid && !_id){
-			console.log("发送请求，获取user数据")
 			this.props.getUser()
 		}
 	}
 	
 	render(){
+		
 		//读取cookie 中的userid 
 		const userid = Cookies.get('userid')
 		//如果 没有userid 自动重重定向到登陆界面
@@ -112,6 +113,7 @@ class Main extends Component {
 					}
 					<Route path="/laobaninfo" component={LaobanInfo}></Route>
 					<Route path="/dasheninfo" component={DashenInfo}></Route>
+					<Route path="/chat/:userid" component={Chat}></Route>
 					<Route component={NotFound}/>
 				</Switch>
 				{ currentNav ? <NavFooter  navList={navList}/> :null }
