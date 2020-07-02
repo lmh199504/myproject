@@ -4,8 +4,8 @@
 	同步action
  */
 
-import { reqLogin,reqRegister,reqUpdataUser,reqUser,reqUserList} from "../api";
-import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST } from "./action-types";
+import { reqLogin,reqRegister,reqUpdataUser,reqUser,reqUserList,reqChatMsgList,reqReadMsg} from "../api";
+import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST,RECEIVE_MSG_LIST,RECEIVE_MSG } from "./action-types";
 import { Toast } from 'antd-mobile'
 import io from 'socket.io-client'
 
@@ -17,9 +17,20 @@ export const errorMsg = (data) => ({type:ERROR_MSG,data})
 //接收用户的同步action
 export const receiveUser = (data) => ({type:RECEIVE_USER,data})
 //重置用户的同步action
-export const resetUser = (data) => ({type:RESET_USER,data})
+export const resetUser = (data) => {
+	io.userid = undefined
+	io.socket = undefined
+	return {type:RESET_USER,data}
+}
 //接收用户列表数据的同步action
 export const receiveUserList = (data) => ({type:RECEIVE_USER_LIST,data})
+//接收消息列表的同步action
+export const receiveMsgList = (data) => ({type:RECEIVE_MSG_LIST,data})
+//接收一个消息的同步action
+export const receiveMsg = (data) => ({type:RECEIVE_MSG,data})
+
+
+
 
 //注册异步action
 export const register = (data) => {
@@ -36,6 +47,8 @@ export const register = (data) => {
         //发送注册的异步请求
         const response = await reqRegister({username,password,type})
         if(response.code === 0){  //成功
+			initIO(response.data._id,dispatch)
+			getMsgList(dispatch)
             return dispatch(authSuccess(response.data))
         }else { //失败
             return dispatch(errorMsg(response.msg))
@@ -57,6 +70,8 @@ export const login = (data) => {
         //发送注册的异步请求
         const response = await reqLogin(data)
         if(response.code === 0){  //成功
+			initIO(response.data._id,dispatch)
+			getMsgList(dispatch)
             return dispatch(authSuccess(response.data))
         }else { //失败
             return dispatch(errorMsg(response.msg))
@@ -86,6 +101,8 @@ export const getUser = () => {
 		const response = await reqUser()
 		if(response.code === 0){
 			//成功
+			initIO(response.data._id,dispatch)
+			getMsgList(dispatch)
 			dispatch(receiveUser(response.data))
 		}else{
 			//失败
@@ -109,18 +126,47 @@ export const getUserList = (data) => {
 //异步发送消息的action 
 export const sendMsg = ({ from,to,content }) => {
 	return dispatch => {
-		initIO()
 		io.socket.emit('sendMsg',{ from,to,content });  //自定义sendMsg事件，发送‘你好服务器’字符串向服务器
 	}
 }
 
-initIO()
-function initIO () {
+
+function initIO (userid,dispatch) {
 	if(!io.socket){
 		//向指定的服务器建立连接，地址可以省略
-		io.socket = io('http://localhost:4000');
+		io.socket = io('ws://localhost:4000');
+		io.socket.on("connect",() => {
+			Toast.info("已连接")
+			
+			if(io.userid){
+				io.socket.emit('sendUser',{userid:io.userid})
+			}
+			
+			if(userid && !io.userid){
+				io.userid = userid
+				io.socket.emit('sendUser',{userid:userid})
+			}
+		})
+		
+		io.socket.on('error',() => {
+			Toast.info("连接失败")
+		})
+		io.socket.on('connect_failed',() => {
+			Toast.info("连接失败")
+		})
+		
 		io.socket.on('receiveMsg',(data)=>{  //接收服务器的消息 receiveMsg事件
-			console.log(data);//你好浏览器
+			console.log(data);
+			dispatch(receiveMsg(data))
 		});
+	}
+}
+
+
+async function getMsgList(dispatch){
+	const response = await reqChatMsgList()
+	if(response.code === 0){
+		const { users,chatMsgs } = response.data
+		dispatch(receiveMsgList({ users,chatMsgs }))
 	}
 }

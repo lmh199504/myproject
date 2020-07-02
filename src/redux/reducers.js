@@ -4,7 +4,7 @@
 
 import { combineReducers } from 'redux'
 import { getRedirectTo } from '../utils/index'
-import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST } from "./action-types";
+import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST,RECEIVE_MSG_LIST,RECEIVE_MSG } from "./action-types";
 const initUser = {
 	username:"", //用户名
 	type:"", //用户类型 dashen/laoban
@@ -38,10 +38,38 @@ function userList (state = initUserList,action){
 	}
 }
 
+const initChat = {
+	users:{}, //用户信息
+	chatMsgs:[], //聊天记录
+	unReadCount:0 //总的未读数量
+}
+function chat (state=initChat,action){
+	switch (action.type){
+		case RECEIVE_MSG_LIST:
+			const {users,chatMsgs} = action.data
+			
+			return {
+				users,
+				chatMsgs,
+				unReadCount:0
+			}
+		case RECEIVE_MSG:
+			return {
+				users:state.users,
+				chatMsgs:[...state.chatMsgs,action.data],
+				unReadCount:0
+			}
+			
+		default:
+			return state
+	}
+}
+
 
 export default combineReducers({
 	user,
-	userList
+	userList,
+	chat
 })
 
 //向外暴露的状态的结构：{user:{}}

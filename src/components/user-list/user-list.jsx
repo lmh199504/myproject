@@ -15,7 +15,6 @@ class UserList extends Component{
 	
 	render(){
 		const { userList } = this.props
-		console.log(userList)
 		return (
 			<WingBlank style={{marginBottom:60,marginTop:50}}>
 				

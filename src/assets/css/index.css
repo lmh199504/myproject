@@ -1,3 +1,7 @@
+
+*{
+	touch-action: pan-y;
+} 
 .main_header{
 	position: fixed;
 	top: 0;
@@ -17,11 +21,12 @@
 	text-align: right;
 	margin-right: 20px;
 }
-#chat-page .am-input-item{
+#chat-page .am-tab-bar{
 	position: fixed;
 	bottom: 0;
 	left: 0;
 	width: 100%;
+	background-color: #ffffff;
 }
 #chat-page .am-list-item .am-input-extra{
 	margin-right: 20px;
