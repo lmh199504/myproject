@@ -4,7 +4,7 @@
 
 import { combineReducers } from 'redux'
 import { getRedirectTo } from '../utils/index'
-import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST,RECEIVE_MSG_LIST,RECEIVE_MSG } from "./action-types";
+import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST,RECEIVE_MSG_LIST,RECEIVE_MSG,READ_MSG } from "./action-types";
 const initUser = {
 	username:"", //用户名
 	type:"", //用户类型 dashen/laoban
@@ -46,20 +46,33 @@ const initChat = {
 function chat (state=initChat,action){
 	switch (action.type){
 		case RECEIVE_MSG_LIST:
-			const {users,chatMsgs} = action.data
+			const {users,chatMsgs,userid} = action.data
 			
 			return {
 				users,
 				chatMsgs,
-				unReadCount:0
+				unReadCount:chatMsgs.reduce((preTotal,msg)=>preTotal+(!msg.read && msg.to === userid),0)
 			}
 		case RECEIVE_MSG:
+			 
 			return {
 				users:state.users,
 				chatMsgs:[...state.chatMsgs,action.data],
-				unReadCount:0
+				unReadCount:state.unReadCount + (action.data.userid === action.data.to && !action.data.read ? 1 : 0)
 			}
+		case READ_MSG:
 			
+			return {
+				users:state.users,
+				chatMsgs:state.chatMsgs.map(msg => {
+					if(action.data.from === msg.from && msg.to === action.data.to && !msg.read){
+						return {...msg,read:true}
+					}else{
+						return msg
+					}
+				}),
+				unReadCount:state.unReadCount - action.data.count
+			}
 		default:
 			return state
 	}

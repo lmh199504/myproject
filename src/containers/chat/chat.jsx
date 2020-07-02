@@ -2,7 +2,8 @@
 import React,{Component} from 'react'
 import { List,NavBar,InputItem,Button,Grid,Icon } from 'antd-mobile'
 import { connect } from 'react-redux'
-import { sendMsg } from '../../redux/actions'
+import QueueAnim from 'rc-queue-anim'
+import { sendMsg,msgRead } from '../../redux/actions'
 
 const Item = List.Item
 class Chat extends Component{
@@ -33,17 +34,41 @@ class Chat extends Component{
 		this.setState({
 			content
 		})
+		
 	}
 	
 	componentDidUpdate(prevProps,prevState){
 		var t = document.body.clientHeight;
 		window.scroll({ top: t, left: 0, behavior: 'smooth' });
+		
+		
 	}
 	componentDidMount(){
 		var t = document.body.clientHeight;
 		window.scroll({ top: t, left: 0, behavior: 'smooth' });
+		
+		const from = this.props.match.params.userid
+		const to = this.props.user._id
+		this.props.msgRead(from,to)
+		
+		
+		let _this = this;
+		document.addEventListener('keydown',_this.myEnter,false)
 	}
 	
+	myEnter = (e) => {
+		if(e.keyCode === 13){
+			this.handleSend()
+		}
+	}
+	componentWillUnmount(){
+		const from = this.props.match.params.userid
+		const to = this.props.user._id
+		this.props.msgRead(from,to)
+		let _this = this
+		document.removeEventListener('keydown',_this.myEnter)
+		
+	}
 	toggleFace(){
 		const isShow = !this.state.isShow
 		this.setState({
@@ -86,34 +111,37 @@ class Chat extends Component{
 				
 				
 				<List style={{marginTop:45,marginBottom:45}}>
-					{
-						msgs.map((msg,index) => {
-							if(msg.to === meId){ //对方发送给我
-								return (
-								
-									<Item
-										key={index}
-										thumb={  targetHeader }
-									>
-									{msg.content}
-									</Item>
-									
-								)
-							}else{
-								return (
-									<Item
-										key={index}
-										className="chat-me"
-										thumb={  meHeader }
-									>
-									{msg.content}
-									</Item>
-								)
-							}
-						})
-					}
+					
 				
-
+					<QueueAnim type="right">
+					
+						{
+							msgs.map((msg,index) => {
+								if(msg.to === meId){ //对方发送给我
+									return (
+									
+										<Item
+											key={index}
+											thumb={  targetHeader }
+										>
+										{msg.content}
+										</Item>
+										
+									)
+								}else{
+									return (
+										<Item
+											key={index}
+											className="chat-me"
+											thumb={  meHeader }
+										>
+										{msg.content}
+										</Item>
+									)
+								}
+							})
+						}
+					</QueueAnim>
 					
 					
 				</List>
@@ -143,5 +171,5 @@ class Chat extends Component{
 
 export default connect(
 	state => ({user:state.user,chat:state.chat }),
-	{sendMsg}
+	{sendMsg,msgRead}
 )(Chat)

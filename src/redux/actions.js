@@ -5,7 +5,7 @@
  */
 
 import { reqLogin,reqRegister,reqUpdataUser,reqUser,reqUserList,reqChatMsgList,reqReadMsg} from "../api";
-import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST,RECEIVE_MSG_LIST,RECEIVE_MSG } from "./action-types";
+import { AUTH_SUCCESS,ERROR_MSG,RECEIVE_USER,RESET_USER,RECEIVE_USER_LIST,RECEIVE_MSG_LIST,RECEIVE_MSG,READ_MSG } from "./action-types";
 import { Toast } from 'antd-mobile'
 import io from 'socket.io-client'
 
@@ -18,6 +18,7 @@ export const errorMsg = (data) => ({type:ERROR_MSG,data})
 export const receiveUser = (data) => ({type:RECEIVE_USER,data})
 //重置用户的同步action
 export const resetUser = (data) => {
+	//退出登录时需要清空 io 否则再次登录不会 更新 数据库的socketid，就会收不到消息
 	io.userid = undefined
 	io.socket = undefined
 	return {type:RESET_USER,data}
@@ -28,7 +29,8 @@ export const receiveUserList = (data) => ({type:RECEIVE_USER_LIST,data})
 export const receiveMsgList = (data) => ({type:RECEIVE_MSG_LIST,data})
 //接收一个消息的同步action
 export const receiveMsg = (data) => ({type:RECEIVE_MSG,data})
-
+//标记已读消息的同步action
+export const readMsg = (data) => ({type:READ_MSG,data})
 
 
 
@@ -48,7 +50,7 @@ export const register = (data) => {
         const response = await reqRegister({username,password,type})
         if(response.code === 0){  //成功
 			initIO(response.data._id,dispatch)
-			getMsgList(dispatch)
+			getMsgList(dispatch,response.data._id)
             return dispatch(authSuccess(response.data))
         }else { //失败
             return dispatch(errorMsg(response.msg))
@@ -71,7 +73,7 @@ export const login = (data) => {
         const response = await reqLogin(data)
         if(response.code === 0){  //成功
 			initIO(response.data._id,dispatch)
-			getMsgList(dispatch)
+			getMsgList(dispatch,response.data._id)
             return dispatch(authSuccess(response.data))
         }else { //失败
             return dispatch(errorMsg(response.msg))
@@ -102,7 +104,7 @@ export const getUser = () => {
 		if(response.code === 0){
 			//成功
 			initIO(response.data._id,dispatch)
-			getMsgList(dispatch)
+			getMsgList(dispatch,response.data._id)
 			dispatch(receiveUser(response.data))
 		}else{
 			//失败
@@ -127,6 +129,15 @@ export const getUserList = (data) => {
 export const sendMsg = ({ from,to,content }) => {
 	return dispatch => {
 		io.socket.emit('sendMsg',{ from,to,content });  //自定义sendMsg事件，发送‘你好服务器’字符串向服务器
+	}
+}
+
+//标记已读消息的异步action
+export const msgRead = (from,to) => {
+	return async dispatch => {
+		const response = await reqReadMsg({from})
+		const count = response.data
+		dispatch(readMsg({from,to,count}))
 	}
 }
 
@@ -157,16 +168,17 @@ function initIO (userid,dispatch) {
 		
 		io.socket.on('receiveMsg',(data)=>{  //接收服务器的消息 receiveMsg事件
 			console.log(data);
+			data.userid = io.userid || userid
 			dispatch(receiveMsg(data))
 		});
 	}
 }
 
 
-async function getMsgList(dispatch){
+async function getMsgList(dispatch,userid){
 	const response = await reqChatMsgList()
 	if(response.code === 0){
 		const { users,chatMsgs } = response.data
-		dispatch(receiveMsgList({ users,chatMsgs }))
+		dispatch(receiveMsgList({ users,chatMsgs,userid }))
 	}
 }

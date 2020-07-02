@@ -12,10 +12,11 @@ import './nav-footer.css'
 const Item = TabBar.Item
 class NavFooter extends React.Component {
 	static propTypes = {
-		navList:PropTypes.array.isRequired
+		navList:PropTypes.array.isRequired,
+		unReadCount:PropTypes.number.isRequired
 	}
 	render(){
-		let { navList } = this.props
+		let { navList,unReadCount } = this.props
 		navList = navList.filter(nav => !nav.hide)
 		const path = this.props.location.pathname
 		return (
@@ -27,6 +28,7 @@ class NavFooter extends React.Component {
 					{ navList.map((item,index) => (
 						<Item 
 							title={item.text}
+							badge={item.path === '/message' ? unReadCount : 0}
 							icon={ {uri: require(`./images/${item.icon}.png`)} }
 							selectedIcon={{uri:require(`./images/${item.icon}-selected.png`) }}
 							onPress={ () => this.props.history.replace(item.path) }

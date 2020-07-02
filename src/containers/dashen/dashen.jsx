@@ -7,7 +7,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { getUserList } from '../../redux/actions'
+
 import UserList from '../../components/user-list/user-list'
+
 class Dashen extends React.Component {
 	
 	componentDidMount(){

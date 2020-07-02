@@ -12,3 +12,4 @@ export const RECEIVE_USER_LIST = 'receive_user_list'  //接收用户列表
 
 export const RECEIVE_MSG_LIST = 'receive_msg_list' //接收所有相关的消息列表
 export const RECEIVE_MSG = 'receive_msg' //接收一条新的消息
+export const READ_MSG = 'read_msg' //标记已读消息
