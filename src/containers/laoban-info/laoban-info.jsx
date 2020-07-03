@@ -3,7 +3,7 @@
  */
 import React from 'react'
 import { connect } from 'react-redux'
-import { NavBar,InputItem,TextareaItem,Button } from 'antd-mobile'
+import { NavBar,InputItem,TextareaItem,Button,Toast } from 'antd-mobile'
 import { Redirect } from 'react-router-dom'
 import HeaderSelector from '../../components/header-selector/header-selector'
 import { updata } from '../../redux/actions'
@@ -29,7 +29,10 @@ class LaobanInfo extends React.Component{
 		})
 	}
 	save = () => {
-		console.log(this.state)
+		// console.log(this.state)
+		if(this.state.header === ''){
+			return Toast.info('请选择头像')
+		}
 		this.props.updata(this.state)
 	}
 	render() {
