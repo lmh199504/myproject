@@ -145,7 +145,7 @@ export const msgRead = (from,to) => {
 function initIO (userid,dispatch) {
 	if(!io.socket){
 		//向指定的服务器建立连接，地址可以省略
-		io.socket = io('ws://localhost:4000');
+		io.socket = io();
 		io.socket.on("connect",() => {
 			Toast.info("已连接")
 			
